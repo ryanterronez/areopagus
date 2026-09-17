@@ -9,6 +9,16 @@ This repository contains:
 - Terraform for AWS resources used by the application
 - GitHub Actions and other repository-level development tooling
 
+## Repository Layout
+
+```text
+.agents/skills/       # Repository-local agent skills
+.github/workflows/    # GitHub Actions workflows
+src/                  # Python application code
+terraform/            # Areopagus application infrastructure
+tests/                # Application tests
+```
+
 ## AWS Platform
 
 AWS organization and governance are managed separately in the `aws-platform` repository.
