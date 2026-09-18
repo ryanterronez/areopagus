@@ -15,7 +15,7 @@ output "downloader_lambda_name" {
 
 output "lambda_artifact_bucket_name" {
   description = "Name of the private, versioned bucket that stores Lambda deployment packages."
-  value       = "${local.project_name}-${data.aws_caller_identity.current.account_id}-lambda-artifacts"
+  value       = aws_s3_bucket.lambda_artifact.id
 }
 
 output "ingestion_metadata_table_arn" {

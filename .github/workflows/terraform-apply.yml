@@ -13,6 +13,7 @@ on:
       - "terraform/storage.tf"
       - "terraform/terraform.tf"
       - "terraform/variables.tf"
+      - "terraform/lambda.tf"
 
 permissions:
   contents: read

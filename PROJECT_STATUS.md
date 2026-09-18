@@ -29,8 +29,8 @@ Lambda `/tmp` directory; durable ingestion is not yet implemented.
   `yt-dlp`, plus an x86_64 Deno Lambda layer. A dedicated workflow builds the
   packages and uploads them to a private, versioned S3 deployment-artifact
   bucket before applying the Lambda resources.
-- The deployment-artifact bucket is an independent Terraform root with its own
-  state. Apply it once from the CLI before the Lambda deployment workflow.
+- The deployment-artifact bucket is managed in the main Terraform root and
+  state alongside the application resources.
 - After one-time Lambda creation through the main Terraform root, the dedicated
   Lambda workflow publishes a new layer and updates function code through the
   AWS CLI without running Terraform.

@@ -98,15 +98,8 @@ with 1024 MB memory, a 15-minute timeout, and 2048 MB of ephemeral storage for
 the downloaded source audio. Its execution role can write only to its dedicated
 CloudWatch log group. It has no S3 or DynamoDB permissions yet.
 
-Before the first Lambda deployment, apply the independent artifact-bucket
-Terraform root from Command Prompt. Then run the Lambda workflow once to upload
-the initial artifacts, followed by a normal apply of the main Terraform root to
-create the function. Later Lambda workflow runs do not run Terraform.
-
-```cmd
-terraform -chdir=terraform\lambda-artifacts init -input=false -backend-config ..\backend.apply.hcl
-terraform -chdir=terraform\lambda-artifacts apply
-```
+The artifact bucket is managed in the main `terraform/` root and state. Later
+Lambda workflow runs update only the code and Deno layer through the AWS CLI.
 
 For a direct runtime smoke test after deployment, use this exact JSON payload in
 the Lambda console's **Test event** editor:

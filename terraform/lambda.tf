@@ -4,12 +4,12 @@ resource "aws_cloudwatch_log_group" "downloader" {
 }
 
 data "aws_s3_object" "downloader_package" {
-  bucket = "${local.project_name}-${data.aws_caller_identity.current.account_id}-lambda-artifacts"
+  bucket = aws_s3_bucket.lambda_artifact.id
   key    = "lambda/current/areopagus-downloader.zip"
 }
 
 data "aws_s3_object" "deno_layer_package" {
-  bucket = "${local.project_name}-${data.aws_caller_identity.current.account_id}-lambda-artifacts"
+  bucket = aws_s3_bucket.lambda_artifact.id
   key    = "lambda/current/areopagus-deno-layer.zip"
 }
 

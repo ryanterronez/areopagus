@@ -46,3 +46,25 @@ variable "downloader_timeout_seconds" {
     error_message = "Downloader timeout must be between 1 and 900 seconds."
   }
 }
+
+variable "lambda_artifact_deployment_account_id" {
+  description = "AWS account that owns the GitHub Actions deployment role."
+  type        = string
+  default     = "242668368155"
+
+  validation {
+    condition     = can(regex("^[0-9]{12}$", var.lambda_artifact_deployment_account_id))
+    error_message = "Lambda artifact deployment account ID must be a 12-digit AWS account ID."
+  }
+}
+
+variable "lambda_artifact_noncurrent_version_expiration_days" {
+  description = "Number of days to retain superseded Lambda deployment artifact versions."
+  type        = number
+  default     = 30
+
+  validation {
+    condition     = var.lambda_artifact_noncurrent_version_expiration_days >= 1
+    error_message = "Lambda artifact noncurrent version expiration must be at least one day."
+  }
+}
