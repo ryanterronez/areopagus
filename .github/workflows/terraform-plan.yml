@@ -1,15 +1,20 @@
-name: Terraform
+name: Terraform plan
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize]
     paths:
       - "terraform/**"
 
 permissions:
   contents: read
 
+concurrency:
+  group: terraform-plan-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
-  validate:
+  plan:
     name: Validate and plan
     # Fork pull requests must not receive an AWS OIDC token or AWS credentials.
     if: github.event.pull_request.head.repo.fork == false
@@ -36,7 +41,7 @@ jobs:
           role-session-name: areopagus-terraform-plan-${{ github.run_id }}
 
       - name: Initialize Terraform
-        run: terraform init -reconfigure -input=false -backend-config="assume_role.role_arn=arn:aws:iam::503353372972:role/areopagus-terraform-plan-state-access"
+        run: terraform init -input=false -backend-config backend.plan.hcl
 
       - name: Validate configuration
         run: terraform validate -no-color

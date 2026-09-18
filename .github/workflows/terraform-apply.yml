@@ -38,7 +38,7 @@ jobs:
           role-session-name: areopagus-terraform-apply-${{ github.run_id }}
 
       - name: Initialize Terraform
-        run: terraform init -reconfigure -input=false -backend-config="assume_role.role_arn=arn:aws:iam::503353372972:role/areopagus-terraform-state-access"
+        run: terraform init -input=false -backend-config backend.apply.hcl
 
       - name: Validate Terraform configuration
         run: terraform validate -no-color
