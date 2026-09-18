@@ -7,6 +7,13 @@ This repository contains application code, tests, Terraform for future
 application resources, and GitHub Actions tooling. AWS organization and
 governance are managed separately in the `aws-platform` repository.
 
+## Application infrastructure
+
+Terraform configures the first application resources in `us-east-2`: a private
+S3 bucket for downloaded lecture audio and an on-demand DynamoDB table for
+ingestion metadata. Lambda, IAM, event sources, and application integrations
+remain intentionally out of scope until later slices.
+
 ## Repository layout
 
 ```text
