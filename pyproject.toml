@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "areopagus"
+version = "0.1.0"
+description = "Local proof of concept for saving audio from a YouTube URL."
+requires-python = ">=3.10"
+dependencies = ["yt-dlp[default]>=2025.1.15"]
+
+[project.scripts]
+areopagus = "areopagus.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
