@@ -1,15 +1,13 @@
 # Areopagus
 
-Areopagus is an AWS-hosted application.
+Areopagus is an application under development. Its first local Python proof of
+concept downloads the audio from one YouTube video URL and saves it to disk.
 
-This repository contains:
+This repository contains application code, tests, Terraform for future
+application resources, and GitHub Actions tooling. AWS organization and
+governance are managed separately in the `aws-platform` repository.
 
-- Application code
-- Tests
-- Terraform for AWS resources used by the application
-- GitHub Actions and other repository-level development tooling
-
-## Repository Layout
+## Repository layout
 
 ```text
 .agents/skills/       # Repository-local agent skills
@@ -19,39 +17,49 @@ terraform/            # Areopagus application infrastructure
 tests/                # Application tests
 ```
 
-## AWS Platform
+## Local audio proof of concept
 
-AWS organization and governance are managed separately in the `aws-platform` repository.
+Prerequisites: pyenv with a global Python 3.10 or newer selected, and Deno on
+`PATH`. Deno is yt-dlp's JavaScript runtime for current YouTube extraction.
+Install it once from Command Prompt:
 
-The `aws-platform` repository is responsible for platform-level resources such as:
-
-- AWS Organizations
-- Account provisioning
-- Organizational Units
-- Service Control Policies
-- Organization-level governance
-
-This repository is responsible for resources that belong specifically to the Areopagus application and run inside the Areopagus AWS account.
-
-In short:
-
-```text
-aws-platform
-└── AWS platform and governance
-
-areopagus
-├── application code
-└── application infrastructure
+```cmd
+winget install DenoLand.Deno
 ```
 
-## Infrastructure
+Open a new Command Prompt after installing Deno, then verify it is available:
 
-Terraform is used to manage Areopagus infrastructure.
+```cmd
+deno --version
+```
 
-Terraform applies run through GitHub Actions after Terraform changes are merged into `main`. The deployment workflow uses GitHub Actions OIDC to assume a dedicated AWS deployment role and stores state in the shared S3 backend. Do not run applies manually unless this deployment approach is deliberately changed.
+From the repository root, create a virtual environment with pyenv's selected
+Python, activate it, then install the package:
 
-## Development
+```cmd
+pyenv exec python -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
 
-The primary development environment is Windows with Visual Studio Code, Codex, Python, Terraform, AWS CLI, and Git.
+Always activate `.venv` before running local Python commands for this project.
 
-More documentation will be added as the application architecture is built.
+Download audio by passing a single YouTube video URL. The command prints the
+saved file path and writes the audio to `downloads/` by default:
+
+```cmd
+areopagus "https://www.youtube.com/watch?v=VIDEO_ID"
+```
+
+Use `--output-dir` to choose another destination:
+
+```cmd
+areopagus "https://www.youtube.com/watch?v=VIDEO_ID" --output-dir .\audio
+```
+
+This POC downloads only the best available audio-only stream and saves it in
+its source format. It never falls back to downloading video. The Python install
+includes yt-dlp's EJS challenge solver; yt-dlp uses Deno from `PATH` for
+YouTube extraction. FFmpeg is not required, and the POC does not transcode to
+MP3. Only download videos you are permitted to download and use.
