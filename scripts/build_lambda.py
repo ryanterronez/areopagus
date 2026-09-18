@@ -11,8 +11,8 @@ import zipfile
 from pathlib import Path
 
 
-PACKAGE_ROOT = Path(__file__).resolve().parent
-REPOSITORY_ROOT = PACKAGE_ROOT.parents[1]
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+LAMBDA_SOURCE = REPOSITORY_ROOT / "src" / "lambda"
 OUTPUT_DIR = REPOSITORY_ROOT / "terraform" / "build"
 
 
@@ -53,11 +53,12 @@ def build(deno_path: Path) -> None:
                 "--no-compile",
                 "--target",
                 str(function_root),
-                str(PACKAGE_ROOT),
+                "yt-dlp[default]>=2025.1.15",
             ],
             check=True,
             env=pip_environment,
         )
+        shutil.copytree(LAMBDA_SOURCE, function_root, dirs_exist_ok=True)
         create_zip(function_root, OUTPUT_DIR / "areopagus-downloader.zip")
 
         layer_root = staging_directory / "layer"

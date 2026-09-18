@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from .audio import download_audio
+from audio import download_audio
 
 
 def lambda_handler(event: dict[str, Any], _context: Any) -> dict[str, str]:

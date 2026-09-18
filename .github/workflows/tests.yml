@@ -4,7 +4,8 @@ on:
   pull_request:
     paths:
       - "tests/**"
-      - "lambda/downloader/**"
+      - "src/lambda/**"
+      - "scripts/build_lambda.py"
 
 permissions:
   contents: read
@@ -24,10 +25,9 @@ jobs:
           python-version: "3.x"
 
       - name: Compile test files
-        run: python -m compileall -q tests
-
-      - name: Install application
-        run: python -m pip install -e lambda/downloader
+        run: python -m compileall -q tests scripts/build_lambda.py
 
       - name: Run tests
+        env:
+          PYTHONPATH: src/lambda
         run: python -m unittest discover -s tests -v

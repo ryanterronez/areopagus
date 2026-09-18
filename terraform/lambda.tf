@@ -5,12 +5,12 @@ resource "aws_cloudwatch_log_group" "downloader" {
 
 data "aws_s3_object" "downloader_package" {
   bucket = "${local.project_name}-${data.aws_caller_identity.current.account_id}-lambda-artifacts"
-  key    = "lambda/downloader/current/areopagus-downloader.zip"
+  key    = "lambda/current/areopagus-downloader.zip"
 }
 
 data "aws_s3_object" "deno_layer_package" {
   bucket = "${local.project_name}-${data.aws_caller_identity.current.account_id}-lambda-artifacts"
-  key    = "lambda/downloader/current/areopagus-deno-layer.zip"
+  key    = "lambda/current/areopagus-deno-layer.zip"
 }
 
 resource "aws_iam_role" "downloader" {
@@ -70,7 +70,7 @@ resource "aws_lambda_function" "downloader" {
   description   = "Downloads YouTube audio to ephemeral storage; it does not persist audio."
   role          = aws_iam_role.downloader.arn
   runtime       = "python3.13"
-  handler       = "areopagus.lambda_handler.lambda_handler"
+  handler       = "lambda_handler.lambda_handler"
   architectures = ["x86_64"]
 
   s3_bucket         = data.aws_s3_object.downloader_package.bucket

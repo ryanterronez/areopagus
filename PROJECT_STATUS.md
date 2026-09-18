@@ -8,8 +8,8 @@ Lambda `/tmp` directory; durable ingestion is not yet implemented.
 
 ## Implemented in the repository
 
-- Self-contained `lambda/downloader` Python package with the local CLI and
-  `download_audio` utility using `yt-dlp` and Deno.
+- Lambda source under `src/lambda`, with the `download_audio` utility using
+  `yt-dlp` and Deno and a dedicated `scripts/build_lambda.py` packager.
 - Local output handling for audio-only downloads, with no video fallback or
   transcoding requirement.
 - Repository scaffolding, dependency automation, and pull-request workflows

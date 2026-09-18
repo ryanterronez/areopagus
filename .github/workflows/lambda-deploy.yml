@@ -5,7 +5,8 @@ on:
     branches:
       - main
     paths:
-      - "lambda/downloader/**"
+      - "src/lambda/**"
+      - "scripts/build_lambda.py"
   workflow_dispatch:
 
 permissions:
@@ -42,7 +43,7 @@ jobs:
           role-session-name: areopagus-lambda-deploy-${{ github.run_id }}
 
       - name: Build Lambda packages
-        run: python lambda/downloader/build.py --deno-path "$(command -v deno)"
+        run: python scripts/build_lambda.py --deno-path "$(command -v deno)"
 
       - name: Verify Lambda packages
         run: unzip -t terraform/build/areopagus-downloader.zip && unzip -t terraform/build/areopagus-deno-layer.zip
@@ -50,8 +51,8 @@ jobs:
       - name: Publish the Deno layer and update the Lambda function
         env:
           ARTIFACT_BUCKET: areopagus-503353372972-lambda-artifacts
-          FUNCTION_KEY: lambda/downloader/current/areopagus-downloader.zip
-          LAYER_KEY: lambda/downloader/current/areopagus-deno-layer.zip
+          FUNCTION_KEY: lambda/current/areopagus-downloader.zip
+          LAYER_KEY: lambda/current/areopagus-deno-layer.zip
         run: |
           FUNCTION_VERSION=$(aws s3api put-object --bucket "$ARTIFACT_BUCKET" --key "$FUNCTION_KEY" --body terraform/build/areopagus-downloader.zip --query VersionId --output text)
           LAYER_VERSION=$(aws s3api put-object --bucket "$ARTIFACT_BUCKET" --key "$LAYER_KEY" --body terraform/build/areopagus-deno-layer.zip --query VersionId --output text)

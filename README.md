@@ -40,7 +40,8 @@ for plan-state access.
 ```text
 .agents/skills/       # Repository-local agent skills
 .github/workflows/    # GitHub Actions workflows
-lambda/downloader/    # Self-contained Lambda and local CLI package
+src/lambda/            # Lambda handler and downloader source
+scripts/build_lambda.py # Lambda ZIP and layer builder
 terraform/            # Areopagus application infrastructure
 tests/                # Application tests
 ```
@@ -62,28 +63,23 @@ deno --version
 ```
 
 From the repository root, create a virtual environment with pyenv's selected
-Python, activate it, then install the package:
+Python, activate it, then install the downloader dependency:
 
 ```cmd
 pyenv exec python -m venv .venv
 .venv\Scripts\activate.bat
 python -m pip install --upgrade pip
-python -m pip install -e lambda\downloader
+python -m pip install "yt-dlp[default]>=2025.1.15"
 ```
 
 Always activate `.venv` before running local Python commands for this project.
 
-Download audio by passing a single YouTube video URL. The command prints the
-saved file path and writes the audio to `downloads/` by default:
+Download audio by calling `download_audio` with one YouTube video URL. This
+prints the saved file path and writes the audio to `downloads/` by default:
 
 ```cmd
-areopagus "https://www.youtube.com/watch?v=VIDEO_ID"
-```
-
-Use `--output-dir` to choose another destination:
-
-```cmd
-areopagus "https://www.youtube.com/watch?v=VIDEO_ID" --output-dir .\audio
+set PYTHONPATH=src\lambda
+python -c "from audio import download_audio; print(download_audio('https://www.youtube.com/watch?v=VIDEO_ID'))"
 ```
 
 This POC downloads only the best available audio-only stream and saves it in
@@ -94,7 +90,7 @@ MP3. Only download videos you are permitted to download and use.
 
 ## Lambda downloader package
 
-The `Deploy Lambda downloader` workflow builds the Lambda ZIP and Deno layer on
+The `Deploy Lambda downloader` workflow builds `src/lambda` and the Deno layer on
 Ubuntu, uploads them to a private versioned S3 artifact bucket, and deploys the
 Lambda code through the AWS CLI. The generated archives are intentionally ignored under
 `terraform/build/`; do not commit them. The function runs Python 3.13 on x86_64
