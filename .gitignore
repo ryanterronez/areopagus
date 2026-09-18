@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Python environments and generated files
 .venv/
 __pycache__/
@@ -12,3 +13,9 @@ terraform/.terraform/
 terraform/*.tfstate
 terraform/*.tfstate.*
 terraform/*.tfplan
+=======
+.venv/
+downloads/
+__pycache__/
+*.egg-info/
+>>>>>>> 6c9dd70e67bce4d4630727f2ebaa4fb2a1818863
