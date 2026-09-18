@@ -48,7 +48,7 @@ areopagus
 
 Terraform is used to manage Areopagus infrastructure.
 
-Terraform applies are currently performed manually from a local, authenticated administrator environment. GitHub Actions should not automatically apply Terraform unless that approach is deliberately changed in the future.
+Terraform applies run through GitHub Actions after Terraform changes are merged into `main`. The deployment workflow uses GitHub Actions OIDC to assume a dedicated AWS deployment role and stores state in the shared S3 backend. Do not run applies manually unless this deployment approach is deliberately changed.
 
 ## Development
 
