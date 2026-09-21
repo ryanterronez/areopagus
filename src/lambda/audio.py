@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import yt_dlp
@@ -15,9 +16,11 @@ def download_audio(url: str, output_dir: Path | str = "downloads") -> Path:
     """
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
+    deno_path = os.environ.get("AREOPAGUS_DENO_PATH")
+    deno_config = {"path": deno_path} if deno_path else {}
     options = {
         "format": "bestaudio",
-        "js_runtimes": {"deno": {}},
+        "js_runtimes": {"deno": deno_config},
         "noplaylist": True,
         "outtmpl": str(destination / "%(title)s.%(ext)s"),
         "quiet": True,

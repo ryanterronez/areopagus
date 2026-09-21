@@ -2,13 +2,14 @@
 
 ## Current phase
 
-Local ingestion proof of concept with the first AWS application foundation deployed.
-The repository can download audio from one YouTube video URL to local disk; the
-lecture-ingestion Lambda and application workflow are not yet implemented.
+Local ingestion proof of concept with the downloader prepared for Lambda. The
+repository can download audio from one YouTube video URL to local disk or a
+Lambda `/tmp` directory; durable ingestion is not yet implemented.
 
 ## Implemented in the repository
 
-- Packaged Python CLI and `download_audio` utility using `yt-dlp` and Deno.
+- Lambda source under `src/lambda`, with the `download_audio` utility using
+  `yt-dlp` and Deno and a dedicated `scripts/build_lambda.py` packager.
 - Local output handling for audio-only downloads, with no video fallback or
   transcoding requirement.
 - Repository scaffolding, dependency automation, and pull-request workflows
@@ -24,6 +25,21 @@ lecture-ingestion Lambda and application workflow are not yet implemented.
 - Deployment-role permissions in `aws-platform` now allow application
   infrastructure deployment and bounded management of application IAM roles.
   AWS organization and governance remain in `aws-platform`.
+- All taggable application resources receive the common `app-name = areopagus`
+  tag through the AWS provider's default tags.
+- Lambda downloader runtime: a Python 3.13 ZIP containing the application and
+  `yt-dlp`, plus an x86_64 Deno Lambda layer. A dedicated workflow builds the
+  packages and uploads them to a private, versioned S3 deployment-artifact
+  bucket before applying the Lambda resources.
+- The deployment-artifact bucket is managed in the main Terraform root and
+  state alongside the application resources.
+- After one-time Lambda creation through the main Terraform root, the dedicated
+  Lambda workflow publishes a new layer and updates function code through the
+  AWS CLI without running Terraform.
+- Least-privilege downloader Lambda execution role, restricted to its
+  CloudWatch log group. It has no S3 or DynamoDB data permissions yet.
+- Downloader Lambda configured with a 15-minute timeout, 1024 MB memory, and
+  2048 MB ephemeral storage for source-format audio downloads.
 
 ## Defined direction, not yet implemented
 
@@ -39,13 +55,12 @@ lecture-ingestion Lambda and application workflow are not yet implemented.
 
 ## Current work
 
-Design and implement the least-privilege ingestion Lambda IAM role and the
-lecture-ingestion Lambda using the deployed S3 and DynamoDB resources.
+Implement the ingestion flow that persists the Lambda downloader output to S3
+and records deduplicated DynamoDB metadata.
 
 ## Next steps
 
-- Add automated behavior tests for the downloader and CLI.
-- Add the ingestion Lambda execution role and Lambda.
+- Add S3 upload and DynamoDB conditional-write ingestion behavior.
 - Design and implement transcript ingestion, indexing, search, and Slack
   access-control.
 

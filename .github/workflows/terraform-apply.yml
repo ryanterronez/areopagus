@@ -5,7 +5,15 @@ on:
     branches:
       - main
     paths:
-      - "terraform/**"
+      - "terraform/backend.tf"
+      - "terraform/locals.tf"
+      - "terraform/metadata.tf"
+      - "terraform/outputs.tf"
+      - "terraform/providers.tf"
+      - "terraform/storage.tf"
+      - "terraform/terraform.tf"
+      - "terraform/variables.tf"
+      - "terraform/lambda.tf"
 
 permissions:
   contents: read

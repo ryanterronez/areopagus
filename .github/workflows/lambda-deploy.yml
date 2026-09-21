@@ -1,0 +1,69 @@
+name: Deploy Lambda downloader
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/lambda/**"
+      - "scripts/build_lambda.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: lambda-downloader-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.13"
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: "2.9.0"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@4a1596c86fd706dc0521e32f0121ad1a6d1adb74 # v6
+        with:
+          aws-region: us-east-2
+          role-to-assume: arn:aws:iam::242668368155:role/areopagus-github-actions-deployment
+          role-session-name: areopagus-lambda-deploy-${{ github.run_id }}
+
+      - name: Build Lambda packages
+        run: python scripts/build_lambda.py --deno-path "$(command -v deno)"
+
+      - name: Verify Lambda packages
+        run: unzip -t terraform/build/areopagus-downloader.zip && unzip -t terraform/build/areopagus-deno-layer.zip
+
+      - name: Publish the Deno layer and update the Lambda function
+        env:
+          ARTIFACT_BUCKET: areopagus-503353372972-lambda-artifacts
+          FUNCTION_KEY: lambda/current/areopagus-downloader.zip
+          LAYER_KEY: lambda/current/areopagus-deno-layer.zip
+        run: |
+          FUNCTION_VERSION=$(aws s3api put-object --bucket "$ARTIFACT_BUCKET" --key "$FUNCTION_KEY" --body terraform/build/areopagus-downloader.zip --query VersionId --output text)
+          LAYER_VERSION=$(aws s3api put-object --bucket "$ARTIFACT_BUCKET" --key "$LAYER_KEY" --body terraform/build/areopagus-deno-layer.zip --query VersionId --output text)
+
+          if ! aws lambda get-function --function-name areopagus-downloader >/dev/null 2>&1; then
+            echo "Artifacts uploaded. Run the one-time main Terraform apply to create the Lambda function."
+            exit 0
+          fi
+
+          LAYER_ARN=$(aws lambda publish-layer-version --layer-name areopagus-deno --compatible-runtimes python3.13 --compatible-architectures x86_64 --content S3Bucket="$ARTIFACT_BUCKET",S3Key="$LAYER_KEY",S3ObjectVersion="$LAYER_VERSION" --query LayerVersionArn --output text)
+          aws lambda update-function-code --function-name areopagus-downloader --s3-bucket "$ARTIFACT_BUCKET" --s3-key "$FUNCTION_KEY" --s3-object-version "$FUNCTION_VERSION"
+          aws lambda wait function-updated --function-name areopagus-downloader
+          aws lambda update-function-configuration --function-name areopagus-downloader --layers "$LAYER_ARN"
+          aws lambda wait function-updated --function-name areopagus-downloader

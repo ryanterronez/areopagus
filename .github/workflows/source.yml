@@ -3,7 +3,8 @@ name: Source
 on:
   pull_request:
     paths:
-      - "src/**"
+      - "src/lambda/**"
+      - "scripts/build_lambda.py"
 
 permissions:
   contents: read
@@ -23,4 +24,4 @@ jobs:
           python-version: "3.x"
 
       - name: Compile source files
-        run: python -m compileall -q src
+        run: python -m compileall -q src/lambda scripts/build_lambda.py
