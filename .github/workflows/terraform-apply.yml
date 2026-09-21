@@ -5,15 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "terraform/backend.tf"
-      - "terraform/locals.tf"
-      - "terraform/metadata.tf"
-      - "terraform/outputs.tf"
-      - "terraform/providers.tf"
-      - "terraform/storage.tf"
-      - "terraform/terraform.tf"
-      - "terraform/variables.tf"
-      - "terraform/lambda.tf"
+      - "terraform/**"
 
 permissions:
   contents: read
@@ -45,7 +37,7 @@ jobs:
         with:
           aws-region: us-east-2
           role-to-assume: arn:aws:iam::242668368155:role/areopagus-github-actions-deployment
-          role-session-name: areopagus-terraform-apply-${{ github.run_id }}
+          role-session-name: areopagus-github-actions-deployment-${{ github.run_id }}
 
       - name: Initialize Terraform
         run: terraform init -input=false -backend-config backend.apply.hcl

@@ -37,7 +37,9 @@ Lambda `/tmp` directory; durable ingestion is not yet implemented.
   Lambda workflow publishes a new layer and updates function code through the
   AWS CLI without running Terraform.
 - Least-privilege downloader Lambda execution role, restricted to its
-  CloudWatch log group. It has no S3 or DynamoDB data permissions yet.
+  CloudWatch log group and created under the platform-required application IAM
+  path with its permissions boundary. It has no S3 or DynamoDB data
+  permissions yet.
 - Downloader Lambda configured with a 15-minute timeout, 1024 MB memory, and
   2048 MB ephemeral storage for source-format audio downloads.
 

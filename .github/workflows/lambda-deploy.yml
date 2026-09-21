@@ -50,7 +50,7 @@ jobs:
 
       - name: Publish the Deno layer and update the Lambda function
         env:
-          ARTIFACT_BUCKET: areopagus-503353372972-lambda-artifacts
+          ARTIFACT_BUCKET: areopagus-242668368155-lambda-artifacts
           FUNCTION_KEY: lambda/current/areopagus-downloader.zip
           LAYER_KEY: lambda/current/areopagus-deno-layer.zip
         run: |
