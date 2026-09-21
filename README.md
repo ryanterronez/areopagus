@@ -14,6 +14,24 @@ S3 bucket for downloaded lecture audio and an on-demand DynamoDB table for
 ingestion metadata. Lambda, IAM, event sources, and application integrations
 remain intentionally out of scope until later slices.
 
+### Local Terraform
+
+Terraform assumes the local Terraform role by default. After authenticating
+your local AWS credentials, initialize the appropriate state backend, then run
+Terraform normally:
+
+```cmd
+cd terraform
+terraform init -backend-config=backend.plan.hcl
+terraform plan
+```
+
+GitHub Actions sets `assume_local_terraform_role` to `false`, retaining the AWS
+roles configured by its workflows. The backend configuration and its
+state-access role remain separate from this provider setting. Use the backend
+configuration appropriate to the operation; for example, `backend.plan.hcl`
+for plan-state access.
+
 ## Repository layout
 
 ```text
