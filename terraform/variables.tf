@@ -8,3 +8,9 @@ variable "audio_noncurrent_version_expiration_days" {
     error_message = "Audio noncurrent version expiration must be at least one day."
   }
 }
+
+variable "assume_local_terraform_role" {
+  description = "Whether the AWS provider assumes the local Terraform role."
+  type        = bool
+  default     = true
+}

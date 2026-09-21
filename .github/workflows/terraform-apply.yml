@@ -22,6 +22,8 @@ jobs:
     defaults:
       run:
         working-directory: terraform
+    env:
+      TF_VAR_assume_local_terraform_role: "false"
 
     steps:
       - name: Check out repository
