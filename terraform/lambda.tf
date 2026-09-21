@@ -1,3 +1,5 @@
+data "aws_partition" "current" {}
+
 resource "aws_cloudwatch_log_group" "downloader" {
   name              = "/aws/lambda/${local.project_name}-downloader"
   retention_in_days = 30
@@ -14,7 +16,9 @@ data "aws_s3_object" "deno_layer_package" {
 }
 
 resource "aws_iam_role" "downloader" {
-  name = "${local.project_name}-downloader"
+  name                 = "${local.project_name}-downloader"
+  path                 = "/areopagus/application/"
+  permissions_boundary = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/areopagus/guardrails/AreopagusApplicationPermissionsBoundary"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
