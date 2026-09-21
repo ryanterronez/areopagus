@@ -25,6 +25,8 @@ Lambda `/tmp` directory; durable ingestion is not yet implemented.
 - Deployment-role permissions in `aws-platform` now allow application
   infrastructure deployment and bounded management of application IAM roles.
   AWS organization and governance remain in `aws-platform`.
+- All taggable application resources receive the common `app-name = areopagus`
+  tag through the AWS provider's default tags.
 - Lambda downloader runtime: a Python 3.13 ZIP containing the application and
   `yt-dlp`, plus an x86_64 Deno Lambda layer. A dedicated workflow builds the
   packages and uploads them to a private, versioned S3 deployment-artifact
