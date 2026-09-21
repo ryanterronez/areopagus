@@ -12,11 +12,6 @@ resource "aws_s3_bucket" "lambda_artifact" {
   force_destroy = false
 }
 
-import {
-  to = aws_s3_bucket.lambda_artifact
-  id = "areopagus-503353372972-lambda-artifacts"
-}
-
 resource "aws_s3_bucket_ownership_controls" "lambda_artifact" {
   bucket = aws_s3_bucket.lambda_artifact.id
 
