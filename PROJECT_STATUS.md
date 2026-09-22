@@ -2,14 +2,13 @@
 
 ## Current phase
 
-Local ingestion proof of concept with the downloader prepared for Lambda. The
-repository can download audio from one YouTube video URL to local disk or a
-Lambda `/tmp` directory; durable ingestion is not yet implemented.
+Local ingestion proof of concept. The repository downloads audio from one
+YouTube video URL to local disk; durable ingestion is not yet implemented.
 
 ## Implemented in the repository
 
-- Lambda source under `src/lambda`, with the `download_audio` utility using
-  `yt-dlp` and Deno and a dedicated `scripts/build_lambda.py` packager.
+- Local downloader source under `src/areopagus`, with the `download_audio`
+  utility using `yt-dlp` and Deno.
 - Local output handling for audio-only downloads, with no video fallback or
   transcoding requirement.
 - Repository scaffolding, dependency automation, and pull-request workflows
@@ -27,21 +26,6 @@ Lambda `/tmp` directory; durable ingestion is not yet implemented.
   AWS organization and governance remain in `aws-platform`.
 - All taggable application resources receive the common `app-name = areopagus`
   tag through the AWS provider's default tags.
-- Lambda downloader runtime: a Python 3.13 ZIP containing the application and
-  `yt-dlp`, plus an x86_64 Deno Lambda layer. A dedicated workflow builds the
-  packages and uploads them to a private, versioned S3 deployment-artifact
-  bucket before applying the Lambda resources.
-- The deployment-artifact bucket is managed in the main Terraform root and
-  state alongside the application resources.
-- After one-time Lambda creation through the main Terraform root, the dedicated
-  Lambda workflow publishes a new layer and updates function code through the
-  AWS CLI without running Terraform.
-- Least-privilege downloader Lambda execution role, restricted to its
-  CloudWatch log group and created under the platform-required application IAM
-  path with its permissions boundary. It has no S3 or DynamoDB data
-  permissions yet.
-- Downloader Lambda configured with a 15-minute timeout, 1024 MB memory, and
-  2048 MB ephemeral storage for source-format audio downloads.
 
 ## Defined direction, not yet implemented
 
@@ -57,8 +41,8 @@ Lambda `/tmp` directory; durable ingestion is not yet implemented.
 
 ## Current work
 
-Implement the ingestion flow that persists the Lambda downloader output to S3
-and records deduplicated DynamoDB metadata.
+Implement the local bootstrap flow that persists downloader output to S3 and
+records deduplicated DynamoDB metadata.
 
 ## Next steps
 
@@ -83,5 +67,5 @@ and records deduplicated DynamoDB metadata.
 
 ## Open questions / blockers
 
-- The detailed ingestion workflow, Lambda execution permissions, and
-  transcript-search architecture are still to be selected.
+- The detailed local ingestion workflow and transcript-search architecture are
+  still to be selected.
