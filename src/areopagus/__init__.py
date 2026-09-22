@@ -1,1 +1,0 @@
-"""Areopagus local ingestion utilities."""
