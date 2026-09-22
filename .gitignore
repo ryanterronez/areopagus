@@ -13,4 +13,3 @@ downloads/
 **/*.tfstate
 **/*.tfstate.*
 **/*.tfplan
-terraform/build/

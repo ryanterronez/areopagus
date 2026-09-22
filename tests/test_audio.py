@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from audio import download_audio
+from areopagus.audio import download_audio
 
 
 class _Downloader:
@@ -31,9 +31,9 @@ class _Downloader:
 
 
 class DownloadAudioTests(unittest.TestCase):
-    def test_uses_explicit_deno_path_when_configured_for_lambda(self) -> None:
+    def test_uses_explicit_deno_path_when_configured(self) -> None:
         with patch.dict(os.environ, {"AREOPAGUS_DENO_PATH": "/opt/bin/deno"}):
-            with patch("audio.yt_dlp.YoutubeDL", _Downloader):
+            with patch("areopagus.audio.yt_dlp.YoutubeDL", _Downloader):
                 download_audio("https://youtube.com/watch?v=video", Path.cwd())
 
         self.assertEqual(
@@ -43,7 +43,7 @@ class DownloadAudioTests(unittest.TestCase):
 
     def test_uses_path_discovery_for_local_downloads(self) -> None:
         with patch.dict(os.environ, {}, clear=True):
-            with patch("audio.yt_dlp.YoutubeDL", _Downloader):
+            with patch("areopagus.audio.yt_dlp.YoutubeDL", _Downloader):
                 download_audio("https://youtube.com/watch?v=video", Path.cwd())
 
         self.assertEqual(_Downloader.options["js_runtimes"], {"deno": {}})
