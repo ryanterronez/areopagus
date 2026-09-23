@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "ingestion_uploads" {
-  bucket = "areopagus-ingestion-uploads"
+  bucket = "areopagus-app-ingestion-uploads"
 }
 
 resource "aws_s3_bucket_public_access_block" "ingestion_uploads" {
