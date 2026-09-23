@@ -18,7 +18,7 @@ terraform plan
 terraform apply
 ```
 
-Terraform creates `areopagus-ingestion-uploads` for files uploaded by the local ingestion script. The bucket blocks all public access and uses Amazon S3-managed server-side encryption (SSE-S3). The script should use your existing AWS IAM Identity Center / SSO credentials; this repository does not create credentials or IAM access for local uploads. After applying, the bucket name is also available as the `ingestion_uploads_bucket_name` Terraform output.
+Terraform creates `areopagus-ingestion-uploads` for files uploaded by the local ingestion script. The bucket blocks all public access and uses Amazon S3-managed server-side encryption (SSE-S3). Terraform also creates `areopagus-video-metadata`, an on-demand DynamoDB table for video and ingestion metadata, keyed by the stable YouTube video ID (`video_id`). The script should use your existing AWS IAM Identity Center / SSO credentials; this repository does not create credentials or IAM access for local uploads. After applying, the resource names are available as the `ingestion_uploads_bucket_name` and `video_metadata_table_name` Terraform outputs.
 
 ## GitHub Actions
 
