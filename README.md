@@ -5,7 +5,7 @@ The project is at a clean restart point.
 There is currently no application implementation and no Terraform-managed Areopagus application infrastructure. Architecture for the rebuild has not yet been implemented.
 # Areopagus
 
-Areopagus is a small application for ingesting lecture content and making transcripts searchable. This repository currently contains only the Terraform and GitHub Actions bootstrap; application infrastructure has not been created yet.
+Areopagus is a small application for ingesting lecture content and making transcripts searchable. This repository currently contains Terraform, GitHub Actions bootstrap, and a private S3 bucket for ingestion uploads.
 
 ## Terraform
 
@@ -17,6 +17,8 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+Terraform creates `areopagus-ingestion-uploads` for files uploaded by the local ingestion script. The bucket blocks all public access and uses Amazon S3-managed server-side encryption (SSE-S3). The script should use your existing AWS IAM Identity Center / SSO credentials; this repository does not create credentials or IAM access for local uploads. After applying, the bucket name is also available as the `ingestion_uploads_bucket_name` Terraform output.
 
 ## GitHub Actions
 

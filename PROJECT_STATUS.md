@@ -1,5 +1,5 @@
 # Project status
 
-The project is at a clean restart point.
+Terraform manages one application resource: the private S3 bucket `areopagus-ingestion-uploads` in `us-east-2`. It is for files uploaded by the local ingestion script using the developer's existing AWS IAM Identity Center / SSO credentials.
 
-There is currently no application implementation and no Terraform-managed Areopagus application infrastructure. Architecture for the rebuild has not yet been implemented.
+The bucket blocks all public access and uses SSE-S3 encryption. No application IAM, Lambda, transcription, database, eventing, or lifecycle resources exist yet.
