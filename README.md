@@ -1,13 +1,12 @@
 # Areopagus
 
-Areopagus is a small application for ingesting lecture content and making transcripts searchable. Its first application capability downloads a YouTube video's audio on your local Windows machine and uploads that audio stream to the private ingestion S3 bucket.
+Areopagus is a small application for ingesting lecture content and making transcripts searchable. Its current capability downloads YouTube media to your local Windows machine.
 
-## Local YouTube ingestion
+## Local YouTube media download
 
 Prerequisites:
 
 - Python selected by `pyenv`
-- AWS IAM Identity Center / SSO credentials already logged in and permitted to upload to `areopagus-app-ingestion-uploads`
 
 Create and activate the project environment, then install dependencies:
 
@@ -17,15 +16,29 @@ pyenv exec python -m venv .venv
 python -m pip install -r requirements-dev.txt
 ```
 
-Run this from the repository root in Windows Command Prompt, replacing the URL and cookies path:
+Run this from the repository root in Windows Command Prompt, replacing the URL:
 
 ```text
-python -m areopagus.ingest "https://www.youtube.com/watch?v=VIDEO_ID"
+python -m src.ingest "https://www.youtube.com/watch?v=VIDEO_ID"
 ```
 
-The CLI uses unauthenticated yt-dlp access and prefers an audio-only stream at or below 128 kbps, falling back to the best audio-only stream only when no such format is available. This keeps lecture uploads compact without transcoding. It does not download video, and FFmpeg is not required. It writes the audio stream to a temporary directory and removes it after a successful upload (and when the command exits after a failure). Videos that require a signed-in YouTube account are outside this local ingestion slice and will fail clearly.
+By default the CLI downloads compact audio: it prefers an audio-only stream at or below 128 kbps, falling back to the best audio-only stream when needed. Downloads are retained in the gitignored `downloads` directory as `<video-title>.<extension>`, commonly Opus or M4A. yt-dlp makes title-based filenames safe for Windows. To select another directory, add `--output-dir PATH`.
 
-The uploaded object is `youtube/<stable-youtube-video-id>/audio`, for example `youtube/dQw4w9WgXcQ/audio`. Its contents are the compact audio format YouTube serves for that video, commonly Opus or M4A. The CLI derives that stable ID from yt-dlp's YouTube metadata and prints the video ID, bucket, and object key only after S3 reports a successful upload. The default bucket is the existing Terraform output value, `areopagus-app-ingestion-uploads`; use `--bucket NAME` only when intentionally targeting a different bucket.
+Select the media type with `--media`:
+
+```text
+python -m src.ingest "URL" --media audio --quality best
+python -m src.ingest "URL" --media video --quality 720p
+python -m src.ingest "URL" --media both --quality 1080p
+```
+
+`audio` downloads only audio; `video` downloads only the video stream; and `both` downloads and merges audio and video into one file. Video quality accepts `144p`, `240p`, `360p`, `480p`, `720p`, `1080p`, or `best`; `compact` means at most 480p for video. Audio accepts `compact` or `best` (a numeric video quality also selects the best audio stream). For exact yt-dlp stream control, use `--format`, which overrides `--quality`, for example:
+
+```text
+python -m src.ingest "URL" --media both --format "bv*[ext=mp4]+ba[ext=m4a]"
+```
+
+`both` commonly needs [FFmpeg](https://ffmpeg.org/download.html) available on `PATH` because YouTube usually serves audio and video as separate streams. Audio-only and video-only downloads do not require it. Videos that require a signed-in YouTube account are outside this local download slice and will fail clearly.
 
 ## Terraform
 
@@ -42,6 +55,4 @@ Terraform creates `areopagus-app-ingestion-uploads` for files uploaded by the lo
 
 ## GitHub Actions
 
-Pull requests targeting `main` run `terraform init` and `terraform plan`; they never apply changes. Pushes to `main`, including merged pull requests, run `terraform init` and `terraform apply`.
-
-Both workflows use GitHub OIDC to assume `arn:aws:iam::242668368155:role/areopagus-github-actions`. They request only `contents: read` and `id-token: write` permissions.
+Pull requests targeting `main` initialize Terraform without the remote backend and run `terraform validate`. GitHub Actions does not receive AWS credentials or deploy infrastructure; Terraform apply remains a manual local operation.
